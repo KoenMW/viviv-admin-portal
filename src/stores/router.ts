@@ -2,17 +2,21 @@ import type { Component } from "svelte";
 import Home from "../views/Home.svelte";
 import { writable } from "svelte/store";
 import { routeParam } from "../consts";
-import Questionaire from "../views/Questionnaire.svelte";
 import Login from "../views/Login.svelte";
-import Register from "../views/register.svelte";
+import Register from "../views/Register.svelte";
 
 export type Routes = Record<string, Component>;
 
-export type Paths = "" | "questionnaire" | "results" | "login" | "register";
+export type Paths =
+  | ""
+  | "questionnaires"
+  | "results"
+  | "login"
+  | "register"
+  | "users";
 
 export const routes: Routes = {
   "": Home,
-  questionnaire: Questionaire,
   login: Login,
   register: Register,
 };
@@ -24,7 +28,7 @@ const setRouteAndParams = () => {
   route.set(searchParams.get(routeParam) ?? "");
 };
 
-export const goTo = (route: string) => {
+export const goTo = (route: Paths) => {
   const url = new URL(globalThis.location.href);
   url.searchParams.set(routeParam, route);
 

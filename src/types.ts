@@ -6,12 +6,6 @@ export type MPHColors =
   | "green"
   | "purple";
 
-export type QuestionnaireState = "questioning" | "finished" | "reset";
-
-export type MPHScores = Record<string, Record<string, number>>;
-
-export type Questionnairetype = Record<string, string[]>;
-
 export type InputEventType = Event & {
   currentTarget: EventTarget & HTMLInputElement;
 };
@@ -23,16 +17,15 @@ export type Question = {
   content: string;
 };
 
-export type QuestionnairesCardType = {
-  id: string;
-  title: string;
-  color: MPHColors;
-};
-
 export type MPHTopic = {
   id: string;
   name: string;
   color: MPHColors;
 };
 
-export type MPHTopics = Record<string, MPHTopic>;
+export type User = {
+  id: string;
+  username: string;
+  email: string;
+  password: string;
+};

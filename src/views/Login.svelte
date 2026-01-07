@@ -2,11 +2,14 @@
   import Link from "../lib/common/Link.svelte";
   import { jwtStore } from "../stores/jwt";
   import { goTo } from "../stores/router";
-  import { post } from "../util/api";
+  import { get, post } from "../util/api";
 
   let email: string = $state("");
   let password: string = $state("");
   let errorMessage: string = $state("");
+  let loading: boolean = $state(false);
+
+  let form: HTMLFormElement | null = $state(null);
 
   $effect(() => {
     if (email || password) {
@@ -18,31 +21,82 @@
     errorMessage = "";
   };
 
-  const handleSubmit = async (event: Event) => {
-    event.preventDefault();
+  const validateAdminToken = async (token: string): Promise<boolean> => {
+    try {
+      const auth = await get<{
+        ID: string;
+        Role: string;
+      }>(`${import.meta.env.VITE_USER_API_URL}auth/authorize`, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
-    const response = await post(
-      `${import.meta.env.VITE_USER_API_URL}auth/login`,
-      {
-        email,
-        password,
+      if (!auth || !auth.Role) {
+        return false;
       }
-    );
 
-    if (response.ok) {
-      const data = await response.json();
-      jwtStore.set(data.token);
+      return auth.Role === "admin";
+    } catch (error) {
+      console.error("Error validating admin token:", error);
+      return false;
+    }
+  };
+
+  const handleSubmit = async (event: Event) => {
+    try {
+      if (!form) {
+        throw new Error("Form element not found");
+      }
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      event.preventDefault();
+
+      loading = true;
       errorMessage = "";
-      goTo("");
-    } else if (response.status === 401) {
-      errorMessage = "Invalid email or password.";
-    } else {
+
+      const response = await post(
+        `${import.meta.env.VITE_USER_API_URL}auth/login`,
+        {
+          email,
+          password,
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (!data.token || typeof data.token !== "string") {
+          errorMessage = "Invalid response from server.";
+          return;
+        }
+        const isAdmin = await validateAdminToken(data.token);
+        if (!isAdmin) {
+          errorMessage = "You do not have admin privileges.";
+          return;
+        }
+
+        jwtStore.set(data.token);
+        errorMessage = "";
+        goTo("");
+      } else if (response.status === 401) {
+        errorMessage = "Invalid email or password.";
+      } else {
+        errorMessage = "An error occurred. Please try again later.";
+      }
+    } catch (error) {
+      console.error("Login error:", error);
       errorMessage = "An error occurred. Please try again later.";
+    } finally {
+      loading = false;
     }
   };
 </script>
 
-<form>
+<form bind:this={form}>
   {#if errorMessage}
     <p class="error">{errorMessage}</p>
   {/if}
@@ -58,7 +112,13 @@
     bind:value={password}
   />
 
-  <button type="submit" onclick={handleSubmit}>Login</button>
+  <button type="submit" onclick={handleSubmit} disabled={loading}>
+    {#if loading}
+      <div class="spinner"></div>
+    {:else}
+      Login
+    {/if}
+  </button>
   <Link path="register" color="blue">Register</Link>
 </form>
 
@@ -71,7 +131,6 @@
     padding: 2rem;
     box-shadow: 0 0 1rem var(--c-foreground);
     border-radius: 1rem;
-    background-color: var(--c-background-secondary);
   }
 
   label {
