@@ -25,7 +25,11 @@ export type MPHTopic = {
 
 export type User = {
   id: string;
-  username: string;
+  name: string;
   email: string;
   password: string;
+  role: {
+    id: string;
+    name: string;
+  };
 };
