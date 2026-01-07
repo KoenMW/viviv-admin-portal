@@ -1,7 +1,33 @@
+import { get as getStore } from "svelte/store";
+import { jwtStore } from "../stores/jwt";
+
+const ensureAuthorizationHeader = (options: RequestInit): RequestInit => {
+  const jwt = getStore(jwtStore);
+  if (!jwt) return options;
+
+  if (
+    !options.headers ||
+    !(
+      options.headers instanceof Headers && options.headers.has("Authorization")
+    )
+  ) {
+    return {
+      ...options,
+      headers: {
+        ...(options.headers as Record<string, string>),
+        Authorization: `Bearer ${jwt}`,
+      },
+    };
+  }
+  return options;
+};
+
 export const get = async <T>(
   url: string,
   options: RequestInit = {}
 ): Promise<T> => {
+  options = ensureAuthorizationHeader(options);
+
   const response = await fetch(url, {
     ...options,
     method: "GET",
@@ -14,6 +40,8 @@ export const post = async (
   body: unknown,
   options: RequestInit = {}
 ): Promise<Response> => {
+  options = ensureAuthorizationHeader(options);
+
   const response = await fetch(url, {
     ...options,
     method: "POST",

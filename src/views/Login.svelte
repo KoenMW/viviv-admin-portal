@@ -25,18 +25,14 @@
     try {
       const auth = await get<{
         ID: string;
-        Role: string;
-      }>(`${import.meta.env.VITE_USER_API_URL}auth/authorize`, {
-        headers: {
-          Authorization: token,
-        },
-      });
+        role: string;
+      }>(`${import.meta.env.VITE_USER_API_URL}auth/authorize`);
 
-      if (!auth || !auth.Role) {
+      if (!auth || !auth.role) {
         return false;
       }
 
-      return auth.Role === "admin";
+      return auth.role === "admin";
     } catch (error) {
       console.error("Error validating admin token:", error);
       return false;
