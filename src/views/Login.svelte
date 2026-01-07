@@ -26,7 +26,11 @@
       const auth = await get<{
         ID: string;
         role: string;
-      }>(`${import.meta.env.VITE_USER_API_URL}auth/authorize`);
+      }>(`${import.meta.env.VITE_USER_API_URL}auth/authorize`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!auth || !auth.role) {
         return false;
