@@ -20,9 +20,6 @@
     background-repeat: no-repeat;
     background-position: center;
     background-color: transparent;
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
   }
 
   :global(.light) button {

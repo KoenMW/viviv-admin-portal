@@ -17,6 +17,7 @@
     params={{
       questionnaire: id,
     }}
+    {color}
     width="100%">Kies</Link
   >
 </div>
@@ -32,6 +33,11 @@
     padding: 1rem;
     border-radius: 1rem;
     justify-content: space-between;
+  }
+
+  :global(html.light) .container {
+    box-shadow: none;
+    border: 0.1rem solid var(--color);
   }
 
   h3 {

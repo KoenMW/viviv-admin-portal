@@ -3,14 +3,18 @@ import Home from "../views/Home.svelte";
 import { writable } from "svelte/store";
 import { routeParam } from "../consts";
 import Questionaire from "../views/Questionnaire.svelte";
+import Login from "../views/Login.svelte";
+import Register from "../views/register.svelte";
 
 export type Routes = Record<string, Component>;
 
-export type Paths = "" | "questionnaire" | "results";
+export type Paths = "" | "questionnaire" | "results" | "login" | "register";
 
 export const routes: Routes = {
   "": Home,
   questionnaire: Questionaire,
+  login: Login,
+  register: Register,
 };
 
 export const route = writable<string>("");
@@ -25,6 +29,7 @@ export const goTo = (route: string) => {
   url.searchParams.set(routeParam, route);
 
   history.pushState({}, "", url);
+  window.location.reload();
 };
 
 setRouteAndParams();

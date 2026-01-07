@@ -5,12 +5,12 @@
 
   type Props = {
     path: Paths;
+    color: MPHColors;
     children: Snippet;
   };
 
   type PartialProps = Partial<{
     params: Record<string, string>;
-    color: MPHColors;
     width: "auto" | "100%";
   }>;
 
@@ -37,3 +37,14 @@
   style="{color && `--color: var(--c-${color})`}; width: {width}"
   >{@render children()}</a
 >
+
+<style>
+  a:hover {
+    scale: 1.05;
+    border-color: transparent;
+  }
+
+  a:active {
+    scale: 0.95;
+  }
+</style>
