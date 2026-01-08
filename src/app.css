@@ -18,7 +18,7 @@
   --c-orange: #ee7006;
   --c-green: #95c21f;
   --c-white: #ffffff;
-  --c-offwhite: #f5f5f5;
+  --c-off-white: #f5f5f5;
 
   --c-background: #242424;
   --c-foreground: var(--c-white);
@@ -77,10 +77,15 @@ button {
   font-weight: 500;
   font-family: inherit;
   background-color: var(--color);
+  color: var(--c-background);
   cursor: pointer;
   transition: border-color 0.25s ease, scale 0.25s ease;
-  
 }
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 button:hover {
   scale: 1.05;
 }
@@ -114,4 +119,25 @@ button:active{
   height: 1rem;
   animation: spin 1s linear infinite;
   margin: auto;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(30rem, 80%);
+  padding: 2rem;
+  box-shadow: 0 0 1rem var(--c-foreground);
+  border-radius: 1rem;
+}
+
+label {
+  font-weight: bold;
+}
+
+input {
+  padding: 0.5rem;
+  border: 0.1rem solid var(--c-foreground);
+  border-radius: 0.5rem;
+  font-size: 1rem;
 }

@@ -103,28 +103,6 @@
 {/if}
 
 <style>
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: min(30rem, 80%);
-    padding: 2rem;
-    box-shadow: 0 0 1rem var(--c-foreground);
-    border-radius: 1rem;
-    background-color: var(--c-background-secondary);
-  }
-
-  label {
-    font-weight: bold;
-  }
-
-  input {
-    padding: 0.5rem;
-    border: 0.1rem solid var(--c-foreground);
-    border-radius: 0.5rem;
-    font-size: 1rem;
-  }
-
   .error {
     font-weight: bold;
 

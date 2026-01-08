@@ -101,7 +101,7 @@
   }
 
   th {
-    background-color: var(--c-offwhite);
+    background-color: var(--c-off-white);
     border: 1px solid #ddd;
     padding: 0.5rem;
     text-align: left;

@@ -5,6 +5,7 @@ import { routeParam } from "../consts";
 import Login from "../views/Login.svelte";
 import Register from "../views/Register.svelte";
 import UserManagement from "../views/UserManagement.svelte";
+import UserDetail from "../views/UserDetail.svelte";
 
 export type Routes = Record<Paths, Component>;
 
@@ -22,7 +23,7 @@ export const routes: Routes = {
   login: Login,
   register: Register,
   usersManagement: UserManagement,
-  userDetails: Home,
+  userDetails: UserDetail,
   questionnaireManagement: Home,
   questionnaireDetails: Home,
 };
