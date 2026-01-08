@@ -21,16 +21,12 @@
     errorMessage = "";
   };
 
-  const validateAdminToken = async (token: string): Promise<boolean> => {
+  const validateAdminToken = async (): Promise<boolean> => {
     try {
       const auth = await get<{
         ID: string;
         role: string;
-      }>(`${import.meta.env.VITE_USER_API_URL}auth/authorize`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      }>(`${import.meta.env.VITE_USER_API_URL}auth/authorize`);
 
       if (!auth || !auth.role) {
         return false;
@@ -73,7 +69,7 @@
           errorMessage = "Invalid response from server.";
           return;
         }
-        const isAdmin = await validateAdminToken(data.token);
+        const isAdmin = await validateAdminToken();
         if (!isAdmin) {
           errorMessage = "You do not have admin privileges.";
           return;

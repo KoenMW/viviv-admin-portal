@@ -43,10 +43,6 @@
   });
 </script>
 
-<svelte:head>
-  <title>Users - Admin Portal</title>
-</svelte:head>
-
 <h1>Users</h1>
 
 <section>

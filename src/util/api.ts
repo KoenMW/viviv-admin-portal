@@ -1,37 +1,22 @@
-import { get as getStore } from "svelte/store";
 import { jwtStore } from "../stores/jwt";
-
-const ensureAuthorizationHeader = (options: RequestInit): RequestInit => {
-  const jwt = getStore(jwtStore);
-  if (!jwt) return options;
-
-  if (
-    !options.headers ||
-    !(
-      options.headers instanceof Headers && options.headers.has("Authorization")
-    )
-  ) {
-    return {
-      ...options,
-      headers: {
-        ...(options.headers as Record<string, string>),
-        Authorization: `Bearer ${jwt}`,
-      },
-    };
-  }
-  return options;
-};
 
 export const get = async <T>(
   url: string,
   options: RequestInit = {}
 ): Promise<T> => {
-  options = ensureAuthorizationHeader(options);
-
   const response = await fetch(url, {
     ...options,
     method: "GET",
+    credentials: "include",
   });
+
+  if (response.status === 401) {
+    const refreshed = await refreshToken();
+    if (refreshed) {
+      return get<T>(url, options);
+    }
+  }
+
   return response.json() as Promise<T>;
 };
 
@@ -40,16 +25,52 @@ export const post = async (
   body: unknown,
   options: RequestInit = {}
 ): Promise<Response> => {
-  options = ensureAuthorizationHeader(options);
-
   const response = await fetch(url, {
     ...options,
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
     },
     body: JSON.stringify(body),
   });
+
+  if (response.status === 401) {
+    const refreshed = await refreshToken();
+    if (refreshed) {
+      return post(url, body, options);
+    }
+  }
+
   return response;
+};
+
+export const refreshToken = async (): Promise<boolean> => {
+  const response = await fetch(
+    `${import.meta.env.VITE_USER_API_URL}auth/refresh-token`,
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
+
+  const body = await response.json();
+  if (body.token) {
+    console.log("Refreshed token");
+    jwtStore.set(body.token);
+  } else {
+    console.error("Failed to refresh token");
+    jwtStore.set(null);
+  }
+
+  return response.ok;
+};
+
+export const logout = async (): Promise<void> => {
+  await fetch(`${import.meta.env.VITE_USER_API_URL}auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+  jwtStore.set(null);
 };

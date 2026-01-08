@@ -1,11 +1,22 @@
 <script lang="ts">
-  import { goTo, route, routes } from "./stores/router";
+  import { goTo, route, routes, type Paths } from "./stores/router";
   import notFound from "./views/404.svelte";
   import DarkMode from "./lib/common/DarkMode.svelte";
   import { jwtStore } from "./stores/jwt";
   import Link from "./lib/common/Link.svelte";
+  import { type Component } from "svelte";
+  import { logout, refreshToken } from "./util/api";
 
-  const getPage = (route: string) => {
+  type pageType = {
+    component: Component;
+  };
+
+  let page: pageType | null = $state(null);
+
+  const getPage = async (route: Paths): Promise<pageType> => {
+    if (!$jwtStore) {
+      await refreshToken();
+    }
     if (!$jwtStore && route !== "login" && route !== "register") {
       goTo("login");
     }
@@ -14,7 +25,13 @@
     };
   };
 
-  const page = $derived(getPage($route));
+  const updatePage = async (route: Paths) => {
+    page = await getPage(route);
+  };
+
+  $effect(() => {
+    updatePage($route);
+  });
 </script>
 
 <main>
@@ -28,15 +45,17 @@
       <Link path="login" color="green">Login</Link>
     {:else if !!$jwtStore}
       <button
-        onclick={() => {
-          jwtStore.set(null);
+        onclick={async () => {
+          await logout();
           goTo("");
         }}>Logout</button
       >
     {/if}
     <DarkMode />
   </header>
-  <page.component />
+  {#if page}
+    <page.component />
+  {/if}
 </main>
 
 <style>
