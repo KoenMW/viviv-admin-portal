@@ -12,10 +12,6 @@
   const DeleteUser = async (id: string) => {
     console.log("Delete user with id:", id);
   };
-
-  onMount(() => {
-    console.log("UserRow mounted with user:", user);
-  });
 </script>
 
 <tr>

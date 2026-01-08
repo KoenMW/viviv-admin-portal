@@ -3,6 +3,7 @@
   import type { User } from "../types";
   import { get } from "../util/api";
   import Link from "../lib/common/Link.svelte";
+  import { goTo } from "../stores/router";
 
   let userId: string = $state("");
   let originalUser: User | null = $state(null);
@@ -53,6 +54,7 @@
 
   const deleteUser = async () => {
     console.log("Delete user functionality to be implemented.");
+    goTo("usersManagement");
   };
 </script>
 
