@@ -28,8 +28,5 @@ export type User = {
   name: string;
   email: string;
   password: string;
-  role: {
-    id: string;
-    name: string;
-  };
+  role: string;
 };
