@@ -215,3 +215,46 @@ input {
     display: none;
   }
 }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th {
+  background-color: var(--c-off-white);
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.delete {
+  --color: var(--c-red);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.danger {
+  --color: var(--c-red);
+}
+
+.danger:disabled {
+  --color: var(--c-foreground);
+}
+
+.save {
+  --color: var(--c-green);
+}
+
+.save:disabled {
+  --color: var(--c-foreground);
+}

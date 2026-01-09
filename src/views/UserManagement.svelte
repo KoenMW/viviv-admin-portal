@@ -101,23 +101,3 @@
 
   <p>Total Users: {totalUsers}</p>
 {/if}
-
-<style>
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-  }
-
-  th {
-    background-color: var(--c-off-white);
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    text-align: left;
-  }
-
-  button:disabled {
-    background-color: var(--c-foreground);
-    cursor: not-allowed;
-  }
-</style>

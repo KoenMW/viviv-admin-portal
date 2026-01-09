@@ -25,8 +25,6 @@
     password,
   });
 
-  // $inspect(editedUser, "editedUser");
-
   let isDirty: boolean = $derived.by(() => {
     if (!originalUser) return false;
     return (
@@ -162,21 +160,3 @@
     Delete User
   </button>
 </form>
-
-<style>
-  .danger {
-    --color: var(--c-red);
-  }
-
-  .danger:disabled {
-    --color: var(--c-foreground);
-  }
-
-  .save {
-    --color: var(--c-green);
-  }
-
-  .save:disabled {
-    --color: var(--c-foreground);
-  }
-</style>
