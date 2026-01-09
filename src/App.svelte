@@ -63,7 +63,7 @@
     --margin: 2rem;
     display: flex;
     flex-direction: column;
-    width: calc(100dvw - var(--margin) * 2);
+    width: calc(100% - var(--margin) * 2);
     height: calc(100dvh - var(--margin) * 2);
     align-items: center;
     justify-content: flex-start;
@@ -71,7 +71,7 @@
   }
 
   header {
-    width: 100dvw;
+    width: 100%;
     position: sticky;
 
     top: 0;

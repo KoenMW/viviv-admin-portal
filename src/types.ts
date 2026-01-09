@@ -23,10 +23,16 @@ export type MPHTopic = {
   color: MPHColors;
 };
 
+export type Role = {
+  id: number;
+  name: string;
+};
+
 export type User = {
   id: string;
   name: string;
   email: string;
   password: string;
+  role_id: number;
   role: string;
 };

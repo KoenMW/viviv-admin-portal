@@ -46,25 +46,73 @@ export const post = async (
   return response;
 };
 
-export const refreshToken = async (): Promise<boolean> => {
-  const response = await fetch(
-    `${import.meta.env.VITE_USER_API_URL}auth/refresh-token`,
-    {
-      method: "POST",
-      credentials: "include",
+export const put = async (
+  url: string,
+  body: unknown,
+  options: RequestInit = {}
+): Promise<Response> => {
+  const response = await fetch(url, {
+    ...options,
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+    body: JSON.stringify(body),
+  });
+  if (response.status === 401) {
+    const refreshed = await refreshToken();
+    if (refreshed) {
+      return put(url, body, options);
     }
-  );
-
-  const body = await response.json();
-  if (body.token) {
-    console.log("Refreshed token");
-    jwtStore.set(body.token);
-  } else {
-    console.error("Failed to refresh token");
-    jwtStore.set(null);
   }
+  return response;
+};
 
-  return response.ok;
+export const del = async (
+  url: string,
+  options: RequestInit = {}
+): Promise<Response> => {
+  const response = await fetch(url, {
+    ...options,
+    method: "DELETE",
+    credentials: "include",
+  });
+  if (response.status === 401) {
+    const refreshed = await refreshToken();
+    if (refreshed) {
+      return del(url, options);
+    }
+  }
+  return response;
+};
+
+export const refreshToken = async (): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_USER_API_URL}auth/refresh-token`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+
+    const body = await response.json();
+    if (body.token) {
+      console.log("Refreshed token");
+      jwtStore.set(body.token);
+    } else {
+      console.error("Failed to refresh token");
+      jwtStore.set(null);
+    }
+
+    return response.ok;
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    jwtStore.set(null);
+    return false;
+  }
 };
 
 export const logout = async (): Promise<void> => {

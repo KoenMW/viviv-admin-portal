@@ -2,12 +2,21 @@
   import { onMount } from "svelte";
   import type { User } from "../types";
   import { get } from "../util/api";
-  import Link from "../lib/common/Link.svelte";
   import { goTo } from "../stores/router";
+  import { rolesStore } from "../stores/roles";
+  import { CreateUser, DeleteUser, UpdateUser } from "../util/user";
 
   let userId: string = $state("");
   let originalUser: User | null = $state(null);
-  let editedUser: User | null = $state(null);
+  let editedUser: User = $state({
+    id: "",
+    name: "",
+    email: "",
+    role: "",
+    role_id: "",
+    password: "",
+  });
+  let loading = $state(true);
 
   const dirtyCheck = (original: User | null, edited: User | null) => {
     if (!original || !edited) return false;
@@ -18,7 +27,17 @@
     );
   };
 
+  const checkUserValidity = (user: User | null) => {
+    if (!user) return false;
+    return (
+      user.name.trim() !== "" &&
+      user.email.trim() !== "" &&
+      user.role.trim() !== ""
+    );
+  };
+
   let isDirty = $derived(dirtyCheck(originalUser, editedUser));
+  let validUser = $derived(checkUserValidity(editedUser));
 
   onMount(async () => {
     try {
@@ -39,6 +58,8 @@
       }
     } catch (error) {
       console.error("Error fetching user details:", error);
+    } finally {
+      loading = false;
     }
   });
 
@@ -47,51 +68,98 @@
       editedUser = { ...originalUser };
     }
   };
-
-  const saveChanges = async () => {
-    console.log("Save changes functionality to be implemented.");
-  };
-
-  const deleteUser = async () => {
-    console.log("Delete user functionality to be implemented.");
-    goTo("usersManagement");
-  };
 </script>
 
-{#if !userId}
-  <p
-    >User ID is missing. Please provide a valid user ID. <Link
-      path="usersManagement"
-      color="blue">Go back</Link
-    ></p
+<h2>User Details</h2>
+<form>
+  <label for="name"> Name: </label>
+  <input
+    type="text"
+    id="name"
+    disabled={loading}
+    bind:value={editedUser.name}
+  />
+  <label for="email"> Email: </label>
+  <input
+    type="email"
+    id="email"
+    disabled={loading}
+    bind:value={editedUser.email}
+  />
+  {#if !userId}
+    <label for="password"> Password: </label>
+    <input
+      type="password"
+      id="password"
+      disabled={loading}
+      bind:value={editedUser.password}
+    />
+  {/if}
+  <label for="role"> Role: </label>
+  {#if $rolesStore && $rolesStore.length > 0}
+    <select id="role" disabled={loading} bind:value={editedUser.role}>
+      {#each $rolesStore as role}
+        <option value={role.name}>{role.name}</option>
+      {/each}
+    </select>
+  {:else}
+    <p>Loading roles...</p>
+  {/if}
+
+  <button
+    type="button"
+    class="danger"
+    disabled={!isDirty}
+    onclick={discardChanges}
   >
-{:else if editedUser}
-  <h2>User Details</h2>
-  <form>
-    <label for="name"> Name: </label>
-    <input type="text" id="name" bind:value={editedUser.name} />
-    <label for="email"> Email: </label>
-    <input type="email" id="email" bind:value={editedUser.email} />
-    <label for="role"> Role: </label>
-    <input type="text" id="role" bind:value={editedUser.role} />
+    Discard Changes
+  </button>
+  {#if userId}
     <button
       type="button"
-      class="danger"
-      disabled={!isDirty}
-      onclick={discardChanges}
+      class="save"
+      disabled={!isDirty || !validUser || loading}
+      onclick={async () => {
+        loading = true;
+        const response = await UpdateUser(editedUser);
+        loading = false;
+        if (response.ok) {
+          originalUser = { ...editedUser };
+        }
+      }}
     >
-      Discard Changes
-    </button>
-    <button type="button" class="save" disabled={!isDirty} onclick={() => {}}>
       Save Changes
     </button>
-    <button type="button" class="danger" onclick={deleteUser}>
-      Delete User
+  {:else}
+    <button
+      type="button"
+      class="save"
+      disabled={!validUser || loading}
+      onclick={async () => {
+        loading = true;
+        const response = await CreateUser(editedUser);
+        loading = false;
+      }}
+    >
+      Create User
     </button>
-  </form>
-{:else}
-  <p>Loading user details...</p>
-{/if}
+  {/if}
+  <button
+    type="button"
+    class="danger"
+    disabled={loading || !userId}
+    onclick={async () => {
+      loading = true;
+      const response = await DeleteUser(editedUser);
+      loading = false;
+      if (response.ok) {
+        goTo("usersManagement");
+      }
+    }}
+  >
+    Delete User
+  </button>
+</form>
 
 <style>
   .danger {

@@ -53,10 +53,14 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
+  width: 100%;
   min-height: 100vh;
   background-color: var(--c-background);
   color: var(--c-foreground);
+}
+
+#app {
+  width: 100%;
 }
 
 h1 {
@@ -140,4 +144,19 @@ input {
   border: 0.1rem solid var(--c-foreground);
   border-radius: 0.5rem;
   font-size: 1rem;
+}
+
+.error {
+  font-weight: bold;
+
+  padding: 0.5rem;
+  border: 0.1rem solid var(--c-red);
+  border-radius: 0.5rem;
+  background-color: rgb(from var(--c-red) r g b / 0.5);
+}
+
+@media (max-width: 600px) {
+  .hidden-small {
+    display: none;
+  }
 }

@@ -1,32 +1,33 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import type { User } from "../../types";
+  import { DeleteUser } from "../../util/user";
   import Link from "../common/Link.svelte";
 
   type props = {
     user: User;
+    refresh: () => void;
   };
 
-  let { user }: props = $props();
-
-  const DeleteUser = async (id: string) => {
-    console.log("Delete user with id:", id);
-  };
+  let { user, refresh }: props = $props();
 </script>
 
 <tr>
-  <td>{user.id}</td>
+  <td class="hidden-small">{user.id}</td>
   <td>{user.name}</td>
-  <td>{user.email}</td>
-  <td>{user.role}</td>
-  <td
-    ><Link path="userDetails" params={{ id: user.id }} color="blue">Edit</Link
-    ></td
-  >
-  <td
-    ><button class="delete" onclick={() => DeleteUser(user.id)}>Delete</button
-    ></td
-  >
+  <td class="hidden-small">{user.email}</td>
+  <td class="hidden-small">{user.role}</td>
+  <td>
+    <div class="actions">
+      <Link path="userDetails" params={{ id: user.id }} color="blue">Edit</Link
+      ><button
+        class="delete"
+        onclick={async () => {
+          await DeleteUser(user);
+          refresh();
+        }}>Delete</button
+      >
+    </div>
+  </td>
 </tr>
 
 <style>
@@ -38,5 +39,10 @@
 
   .delete {
     --color: var(--c-red);
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
   }
 </style>

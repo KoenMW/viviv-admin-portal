@@ -117,14 +117,3 @@
   </button>
   <Link path="register" color="blue">Register</Link>
 </form>
-
-<style>
-  .error {
-    font-weight: bold;
-
-    padding: 0.5rem;
-    border: 0.1rem solid var(--c-red);
-    border-radius: 0.5rem;
-    background-color: rgb(from var(--c-red) r g b / 0.5);
-  }
-</style>

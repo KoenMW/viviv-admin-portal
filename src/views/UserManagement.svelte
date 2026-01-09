@@ -3,6 +3,9 @@
   import type { User } from "../types";
   import { get } from "../util/api";
   import UserRow from "../lib/users/UserRow.svelte";
+  import Link from "../lib/common/Link.svelte";
+  import { GetUserRoleName } from "../util/user";
+  import { fetchRoles, rolesStore } from "../stores/roles";
 
   let page: number = $state(1);
   let perPage: number = $state(10);
@@ -25,11 +28,17 @@
 
   const fetchUsers = async () => {
     try {
+      if (!$rolesStore || $rolesStore.length === 0) {
+        await fetchRoles();
+      }
       loading = true;
       const response = await get<User[]>(
         `${import.meta.env.VITE_USER_API_URL}users?page=${page}&per_page=${perPage}`
       );
-      users = response;
+      users = response.map((user) => ({
+        ...user,
+        role: GetUserRoleName(user),
+      }));
       totalUsers = await getUserCount();
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -67,6 +76,7 @@
   </button>
 
   <button onclick={fetchUsers} disabled={loading}> Refresh </button>
+  <Link path="userDetails" color="green">Add New User</Link>
 </section>
 
 {#if loading}
@@ -75,17 +85,16 @@
   <table>
     <thead>
       <tr>
-        <th>ID</th>
+        <th class="hidden-small">ID</th>
         <th>Username</th>
-        <th>Email</th>
-        <th>Role</th>
+        <th class="hidden-small">Email</th>
+        <th class="hidden-small">Role</th>
         <th>Actions</th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
       {#each users as user}
-        <UserRow {user} />
+        <UserRow {user} refresh={fetchUsers} />
       {/each}
     </tbody>
   </table>

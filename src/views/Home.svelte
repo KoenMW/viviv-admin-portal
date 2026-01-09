@@ -6,7 +6,6 @@
 <section>
   <Link path="usersManagement" color="blue">Manage Users</Link>
   <Link path="questionnaireManagement" color="blue">Manage Questionnaires</Link>
-  <Link path="results" color="blue">View Results</Link>
 </section>
 
 <style>
