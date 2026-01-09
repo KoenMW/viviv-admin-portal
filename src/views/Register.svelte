@@ -1,68 +1,71 @@
 <script lang="ts">
   import Link from "../lib/common/Link.svelte";
   import { post } from "../util/api";
+  import { AddToast, AddToastPromise } from "../util/toast";
 
   let email: string = $state("");
   let password: string = $state("");
   let username: string = $state("");
-  let errorMessage: string = $state("");
   let registered: boolean = $state(false);
   let loading: boolean = $state(false);
 
   let form: HTMLFormElement | null = $state(null);
 
-  $effect(() => {
-    if (email || password) {
-      clearError();
-    }
-  });
-
-  const clearError = () => {
-    errorMessage = "";
-  };
-
   const handleSubmit = async (event: Event) => {
-    try {
-      if (!form) {
-        throw new Error("Form element not found");
-      }
-
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-
-      event.preventDefault();
-
-      loading = true;
-      errorMessage = "";
-
-      const response = await post(`${import.meta.env.VITE_USER_API_URL}users`, {
-        email,
-        password,
-        name: username,
-      });
-
-      if (response.ok) {
-      } else if (response.status === 400) {
-        errorMessage = "Invalid email or password.";
-      } else {
-        errorMessage = "An error occurred. Please try again later.";
-      }
-    } catch (error) {
-      console.error("Registration error:", error);
-      errorMessage = "An error occurred. Please try again later.";
-    } finally {
-      loading = false;
+    if (!form) {
+      throw new Error("Form element not found");
     }
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    event.preventDefault();
+
+    loading = true;
+
+    const promise = new Promise<void>(async (resolve, reject) => {
+      try {
+        const response = await post(
+          `${import.meta.env.VITE_USER_API_URL}users`,
+          {
+            email,
+            password,
+            name: username,
+          }
+        );
+
+        if (response.ok) {
+          registered = true;
+        } else if (response.status === 400) {
+          AddToast("Invalid email or password.", "error");
+          reject("Invalid email or password.");
+        } else {
+          AddToast("An error occurred. Please try again later.", "error");
+          reject("An error occurred. Please try again later.");
+        }
+        resolve();
+      } catch (error) {
+        console.error("Registration error:", error);
+        AddToast("An error occurred. Please try again later.", "error");
+        reject(error);
+      } finally {
+        loading = false;
+      }
+    });
+
+    AddToastPromise(promise, {
+      loading: "Registering...",
+      success: "Registration successful!",
+      error: "Registration failed.",
+    });
+    await promise;
   };
 </script>
 
 {#if !registered}
   <form bind:this={form}>
-    {#if errorMessage}
-      <p class="error">{errorMessage}</p>
-    {/if}
     <label for="username">Username:</label>
     <input
       type="text"

@@ -3,23 +3,13 @@
   import { jwtStore } from "../stores/jwt";
   import { goTo } from "../stores/router";
   import { get, post } from "../util/api";
+  import { AddToast, AddToastPromise } from "../util/toast";
 
   let email: string = $state("");
   let password: string = $state("");
-  let errorMessage: string = $state("");
   let loading: boolean = $state(false);
 
   let form: HTMLFormElement | null = $state(null);
-
-  $effect(() => {
-    if (email || password) {
-      clearError();
-    }
-  });
-
-  const clearError = () => {
-    errorMessage = "";
-  };
 
   const validateAdminToken = async (): Promise<boolean> => {
     try {
@@ -53,49 +43,68 @@
       event.preventDefault();
 
       loading = true;
-      errorMessage = "";
 
-      const response = await post(
-        `${import.meta.env.VITE_USER_API_URL}auth/login`,
-        {
-          email,
-          password,
-        }
-      );
+      const promise = new Promise<void>(async (resolve, reject) => {
+        try {
+          const response = await post(
+            `${import.meta.env.VITE_USER_API_URL}auth/login`,
+            {
+              email,
+              password,
+            }
+          );
 
-      if (response.ok) {
-        const data = await response.json();
-        if (!data.token || typeof data.token !== "string") {
-          errorMessage = "Invalid response from server.";
+          if (response.ok) {
+            const data = await response.json();
+            if (!data.token || typeof data.token !== "string") {
+              AddToast("Invalid response from server.", "error");
+              reject("Invalid response from server.");
+              return;
+            }
+            const isAdmin = await validateAdminToken();
+            if (!isAdmin) {
+              AddToast("You do not have admin privileges.", "error");
+              reject("You do not have admin privileges.");
+              return;
+            }
+
+            jwtStore.set(data.token);
+            goTo("");
+          } else if (response.status === 401) {
+            AddToast("Invalid email or password.", "error");
+            reject("Invalid email or password.");
+            return;
+          } else {
+            AddToast("An error occurred. Please try again later.", "error");
+            reject("An error occurred. Please try again later.");
+            return;
+          }
+          resolve();
+        } catch (error) {
+          console.error("Login error:", error);
+          AddToast("An error occurred. Please try again later.", "error");
+          reject(error);
           return;
+        } finally {
+          loading = false;
         }
-        const isAdmin = await validateAdminToken();
-        if (!isAdmin) {
-          errorMessage = "You do not have admin privileges.";
-          return;
-        }
+      });
 
-        jwtStore.set(data.token);
-        errorMessage = "";
-        goTo("");
-      } else if (response.status === 401) {
-        errorMessage = "Invalid email or password.";
-      } else {
-        errorMessage = "An error occurred. Please try again later.";
-      }
+      AddToastPromise(promise, {
+        loading: "Logging in...",
+        success: "Logged in successfully!",
+        error: "Login failed.",
+      });
+
+      await promise;
     } catch (error) {
-      console.error("Login error:", error);
-      errorMessage = "An error occurred. Please try again later.";
-    } finally {
+      console.error("Error in handleSubmit:", error);
       loading = false;
     }
   };
 </script>
 
 <form bind:this={form}>
-  {#if errorMessage}
-    <p class="error">{errorMessage}</p>
-  {/if}
   <label for="email">Email:</label>
   <input type="email" id="email" name="email" required bind:value={email} />
 
@@ -109,11 +118,7 @@
   />
 
   <button type="submit" onclick={handleSubmit} disabled={loading}>
-    {#if loading}
-      <div class="spinner"></div>
-    {:else}
-      Login
-    {/if}
+    Login
   </button>
   <Link path="register" color="blue">Register</Link>
 </form>
