@@ -77,13 +77,18 @@
   <label for="title">Title:</label>
   <input type="text" id="title" bind:value={title} disabled={loading} />
   <label for="color">Color:</label>
-  <select id="color" bind:value={color} disabled={loading}>
-    <option value="blue">Blue</option>
-    <option value="red">Red</option>
-    <option value="green">Green</option>
-    <option value="yellow">Yellow</option>
-    <option value="purple">Purple</option>
-    <option value="orange">Orange</option>
+  <select
+    id="color"
+    style="--background: var(--c-{color})"
+    bind:value={color}
+    disabled={loading}
+  >
+    <option value="blue" style="--color: var(--c-blue)">Blue</option>
+    <option value="red" style="--color: var(--c-red)">Red</option>
+    <option value="green" style="--color: var(--c-green)">Green</option>
+    <option value="yellow" style="--color: var(--c-yellow)">Yellow</option>
+    <option value="orange" style="--color: var(--c-orange)">Orange</option>
+    <option value="purple" style="--color: var(--c-purple)">Purple</option>
   </select>
 
   {#each questions as question}

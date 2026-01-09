@@ -258,3 +258,17 @@ td {
 .save:disabled {
   --color: var(--c-foreground);
 }
+
+select {
+  --background : var(--c-background);
+  padding: 0.5rem;
+  border: 0.1rem solid transparent;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: var(--background);
+}
+
+option {
+  --color: var(--c-foreground);
+  background-color: var(--color);
+}
