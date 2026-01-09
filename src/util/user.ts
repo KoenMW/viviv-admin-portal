@@ -30,5 +30,12 @@ export const UpdateUser = async (user: User) => {
 export const CreateUser = async (user: User) => {
   user.role = GetUserRoleName(user);
 
-  return await post(`${import.meta.env.VITE_USER_API_URL}/users`, user);
+  console.log("Creating user:", user);
+
+  const response = await post(
+    `${import.meta.env.VITE_USER_API_URL}/users`,
+    user
+  );
+  console.log("Create user response:", response);
+  return response;
 };

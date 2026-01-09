@@ -16,6 +16,12 @@ export const fetchRoles = async () => {
     rolesStore.set(data.roles);
   } catch (error) {
     console.error("Error fetching roles:", error);
-    rolesStore.set(null);
+    rolesStore.set([]);
   }
 };
+
+rolesStore.subscribe(async (roles) => {
+  if (roles === null) {
+    await fetchRoles();
+  }
+});

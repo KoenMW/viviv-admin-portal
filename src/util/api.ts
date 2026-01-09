@@ -2,7 +2,8 @@ import { jwtStore } from "../stores/jwt";
 
 export const get = async <T>(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retry = false
 ): Promise<T> => {
   const response = await fetch(url, {
     ...options,
@@ -10,10 +11,10 @@ export const get = async <T>(
     credentials: "include",
   });
 
-  if (response.status === 401) {
+  if (response.status === 401 && !retry) {
     const refreshed = await refreshToken();
     if (refreshed) {
-      return get<T>(url, options);
+      return get<T>(url, options, true);
     }
   }
 
@@ -23,7 +24,8 @@ export const get = async <T>(
 export const post = async (
   url: string,
   body: unknown,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retry = false
 ): Promise<Response> => {
   const response = await fetch(url, {
     ...options,
@@ -36,10 +38,10 @@ export const post = async (
     body: JSON.stringify(body),
   });
 
-  if (response.status === 401) {
+  if (response.status === 401 && !retry) {
     const refreshed = await refreshToken();
     if (refreshed) {
-      return post(url, body, options);
+      return post(url, body, options, true);
     }
   }
 
@@ -49,7 +51,8 @@ export const post = async (
 export const put = async (
   url: string,
   body: unknown,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retry = false
 ): Promise<Response> => {
   const response = await fetch(url, {
     ...options,
@@ -61,10 +64,10 @@ export const put = async (
     },
     body: JSON.stringify(body),
   });
-  if (response.status === 401) {
+  if (response.status === 401 && !retry) {
     const refreshed = await refreshToken();
     if (refreshed) {
-      return put(url, body, options);
+      return put(url, body, options, true);
     }
   }
   return response;
@@ -72,17 +75,18 @@ export const put = async (
 
 export const del = async (
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retry = false
 ): Promise<Response> => {
   const response = await fetch(url, {
     ...options,
     method: "DELETE",
     credentials: "include",
   });
-  if (response.status === 401) {
+  if (response.status === 401 && !retry) {
     const refreshed = await refreshToken();
     if (refreshed) {
-      return del(url, options);
+      return del(url, options, true);
     }
   }
   return response;
