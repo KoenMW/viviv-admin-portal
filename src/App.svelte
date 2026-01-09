@@ -35,6 +35,7 @@
 </script>
 
 <main>
+  <div id="toaster"></div>
   <header>
     <span class="banner"></span>
     <div class="origin">ADMIN PORTAL</div>
@@ -106,5 +107,12 @@
     font-size: 1.2rem;
     font-weight: bold;
     color: var(--c-accent);
+  }
+
+  #toaster {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
   }
 </style>

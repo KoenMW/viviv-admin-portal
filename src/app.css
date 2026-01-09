@@ -12,15 +12,19 @@
   -moz-osx-font-smoothing: grayscale;
 
   --c-red: #e4022e;
+  --c-red-light: #ff4d6d;
   --c-blue: #00a3df;
+  --c-blue-light: #66d1ff;
   --c-purple: #832c87;
   --c-yellow: #f59c00;
   --c-orange: #ee7006;
   --c-green: #95c21f;
+  --c-green-light: #b7e15c;
   --c-white: #ffffff;
   --c-off-white: #f5f5f5;
+  --c-black: #242424;
 
-  --c-background: #242424;
+  --c-background: var(--c-black);
   --c-foreground: var(--c-white);
 
   background-color: var(--c-background);
@@ -29,7 +33,7 @@
 
 .light {
   --c-background: var(--c-white);
-  --c-foreground: #000000;
+  --c-foreground: var(--c-black);
 }
 
 a {
@@ -115,7 +119,7 @@ button:active{
   }
 }
 
-.spinner {
+.loading::before, .spinner {
   border: 0.2rem solid var(--c-background);
   border-top: 0.2rem solid transparent;
   border-radius: 50%;
@@ -146,13 +150,63 @@ input {
   font-size: 1rem;
 }
 
-.error {
+.toast {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  position: relative;
   font-weight: bold;
-
-  padding: 0.5rem;
-  border: 0.1rem solid var(--c-red);
+  margin-bottom: 1rem;
+  min-width: 15rem;
+  max-width: 25rem;
+  box-shadow: 0 0 1rem var(--c-foreground);
+  padding: 0.5rem 2rem 0.5rem 0.5rem;
   border-radius: 0.5rem;
-  background-color: rgb(from var(--c-red) r g b / 0.5);
+  font-family: var(--font-stack);
+  border: 0.1rem solid var(--c-blue);
+  background-color: var(--c-blue-light);
+}
+
+.toast-close {
+  cursor: pointer;
+  position: absolute;
+  right: 0.5rem;
+  padding: 0;
+  color: var(--c-black);
+  background-color: transparent;
+}
+
+.error {
+  border-color: var(--c-red);
+  background-color: var(--c-red-light);
+}
+
+.success {
+  border-color: var(--c-green);
+  background-color: var(--c-green-light);
+}
+
+.info {
+  border-color: var(--c-blue);
+  background-color: var(--c-blue-light);
+}
+
+.loading {
+  border-color: var(--c-white);
+  background-color: var(--c-off-white);
+}
+
+.loading::before {
+  content: "";
+  display: block;
+  border: 0.2rem solid var(--c-black);
+  border-top: 0.2rem solid transparent;
+  margin: 0;
+}
+
+.warning {
+  border-color: var(--c-orange);
+  background-color: var(--c-yellow);
 }
 
 @media (max-width: 600px) {
