@@ -21,7 +21,7 @@
   --c-green: #95c21f;
   --c-green-light: #b7e15c;
   --c-white: #ffffff;
-  --c-off-white: #f5f5f5;
+  --c-off-white: #f5f5f5c1;
   --c-black: #242424;
 
   --c-background: var(--c-black);
@@ -92,6 +92,7 @@ button {
 
 button:disabled {
   cursor: not-allowed;
+  color: var(--c-off-white);
 }
 
 button:hover {
