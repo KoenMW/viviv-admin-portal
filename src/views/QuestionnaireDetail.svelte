@@ -3,12 +3,13 @@
   import type { Question, MPHColors, Questionnaire } from "../types";
   import { get } from "../util/api";
   import {
+    CreateQuestionnaire,
     DeleteQuestionnaire,
     UpdateQuestionnaire,
     UpdateQuestionsInQuestionnaire,
   } from "../util/questionnaire";
   import { goTo } from "../stores/router";
-  import { AddToast } from "../util/toast";
+  import { AddToast, AddToastPromise } from "../util/toast";
 
   let questionnaireId: string = $state("");
   let originalQuestionnaire: Questionnaire | null = $state(null);
@@ -112,39 +113,38 @@
       disabled={!isDirty || loading}
       onclick={async () => {
         loading = true;
-        const response = await UpdateQuestionnaire(editedQuestionnaire);
-        if (!response.ok) {
-          AddToast(
-            "Failed to update questionnaire aborting question update",
-            "error"
-          );
-          loading = false;
-          return;
-        }
-        const questionResponse = await UpdateQuestionsInQuestionnaire(
-          editedQuestionnaire,
-          deleteIds
-        );
+        const success = await UpdateQuestionnaire(editedQuestionnaire);
         loading = false;
-        if (!questionResponse) {
+        if (success) {
           goTo("questionnaireManagement");
-        } else {
-          AddToast("Failed to update questions", "error");
         }
       }}
     >
       Save Changes
     </button>
   {:else}
-    <button type="submit" disabled={loading}> Create Questionnaire </button>
+    <button
+      type="button"
+      disabled={loading}
+      onclick={async () => {
+        loading = true;
+        const success = await CreateQuestionnaire(editedQuestionnaire);
+        loading = false;
+        if (success) {
+          goTo("questionnaireManagement");
+        }
+      }}
+    >
+      Create Questionnaire
+    </button>
   {/if}
   <button
     type="button"
     onclick={async () => {
       loading = true;
-      const response = await DeleteQuestionnaire(editedQuestionnaire);
+      const success = await DeleteQuestionnaire(editedQuestionnaire);
       loading = false;
-      if (response.ok) {
+      if (success) {
         goTo("questionnaireManagement");
       }
     }}

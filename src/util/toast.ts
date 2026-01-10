@@ -1,9 +1,3 @@
-type ToastPromiseMessage = {
-  loading: string;
-  success: string;
-  error: string;
-};
-
 type ToastType = "success" | "error" | "info" | "warning" | "loading";
 
 let toaster: HTMLDivElement | null = null;
@@ -51,25 +45,17 @@ export const AddToast = (message: string, type: ToastType = "info") => {
   }, 3000);
 };
 
-export const AddToastPromise = <T>(
-  promise: Promise<T>,
-  messages: ToastPromiseMessage
-) => {
+export const AddToastPromise = (
+  messages: string
+): ((message: string, status: ToastType) => void) => {
   const [toast, content] = createToast("loading");
-  content.innerText = messages.loading;
+  content.innerText = messages;
 
-  promise
-    .then(() => {
-      toast.className = "toast success";
-      content.innerText = messages.success;
-    })
-    .catch(() => {
-      toast.className = "toast error";
-      content.innerText = messages.error;
-    })
-    .finally(() => {
-      setTimeout(() => {
-        toast.remove();
-      }, 3000);
-    });
+  return (message: string, status: ToastType) => {
+    toast.className = `toast ${status}`;
+    content.innerText = message;
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  };
 };

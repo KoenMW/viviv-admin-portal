@@ -1,38 +1,92 @@
+import { get } from "svelte/store";
 import type { Questionnaire } from "../types";
 import { del, post, put } from "./api";
 import { AddToastPromise } from "./toast";
+import { jwtStore } from "../stores/jwt";
 
-export const DeleteQuestionnaire = async (questionnaire: Questionnaire) => {
-  if (
-    !confirm(
-      `Are you sure you want to delete questionnaire ${questionnaire.title}?`
-    )
-  ) {
-    return { ok: false, error: "Questionnaire deletion cancelled" };
-  }
-
-  const promise = del(
-    `${import.meta.env.VITE_QUESTIONNAIRE_API_URL}questionnaires/${questionnaire.id}`
+export const DeleteQuestionnaire = async (
+  questionnaire: Questionnaire
+): Promise<boolean> => {
+  const toastUpdater = AddToastPromise(
+    `Deleting questionnaire ${questionnaire.title}...`
   );
-  AddToastPromise(promise, {
-    loading: `Deleting questionnaire ${questionnaire.title}...`,
-    success: `Questionnaire ${questionnaire.title} deleted successfully.`,
-    error: `Failed to delete questionnaire ${questionnaire.title}.`,
-  });
-  return await promise;
+  try {
+    if (
+      !confirm(
+        `Are you sure you want to delete questionnaire ${questionnaire.title}?`
+      )
+    ) {
+      return false;
+    }
+
+    const response = await del(
+      `${import.meta.env.VITE_QUESTIONNAIRE_API_URL}questionnaires/${questionnaire.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${get(jwtStore)}`,
+        },
+      }
+    );
+    if (response.ok) {
+      toastUpdater(
+        `Questionnaire ${questionnaire.title} deleted successfully.`,
+        "success"
+      );
+      return true;
+    } else {
+      toastUpdater(
+        `Failed to delete questionnaire ${questionnaire.title}.`,
+        "error"
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error("Error deleting questionnaire:", error);
+    toastUpdater(
+      `Failed to delete questionnaire ${questionnaire.title}.`,
+      "error"
+    );
+    return false;
+  }
 };
 
-export const UpdateQuestionnaire = async (questionnaire: Questionnaire) => {
-  const promise = put(
-    `${import.meta.env.VITE_QUESTIONNAIRE_API_URL}questionnaires/${questionnaire.id}`,
-    questionnaire
+export const UpdateQuestionnaire = async (
+  questionnaire: Questionnaire
+): Promise<boolean> => {
+  const toastUpdater = AddToastPromise(
+    `Updating questionnaire ${questionnaire.title}...`
   );
-  AddToastPromise(promise, {
-    loading: `Updating questionnaire ${questionnaire.title}...`,
-    success: `Questionnaire ${questionnaire.title} updated successfully.`,
-    error: `Failed to update questionnaire ${questionnaire.title}.`,
-  });
-  return await promise;
+  try {
+    const response = await put(
+      `${import.meta.env.VITE_QUESTIONNAIRE_API_URL}questionnaires/${questionnaire.id}`,
+      questionnaire,
+      {
+        headers: {
+          Authorization: `Bearer ${get(jwtStore)}`,
+        },
+      }
+    );
+    if (response.ok) {
+      toastUpdater(
+        `Questionnaire ${questionnaire.title} updated successfully.`,
+        "success"
+      );
+      return true;
+    } else {
+      toastUpdater(
+        `Failed to update questionnaire ${questionnaire.title}.`,
+        "error"
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error("Error updating questionnaire:", error);
+    toastUpdater(
+      `Failed to update questionnaire ${questionnaire.title}.`,
+      "error"
+    );
+    return false;
+  }
 };
 
 /**
@@ -45,66 +99,51 @@ export const UpdateQuestionnaire = async (questionnaire: Questionnaire) => {
 export const UpdateQuestionsInQuestionnaire = async (
   questionnaire: Questionnaire,
   deleteIds: string[]
-) => {
-  for (const id of deleteIds) {
-    const promise = del(
-      `${import.meta.env.VITE_QUESTIONNAIRE_API_URL}questions/${id}`
-    );
-    AddToastPromise(promise, {
-      loading: `Deleting question in questionnaire ${questionnaire.title}...`,
-      success: `Question in questionnaire ${questionnaire.title} deleted successfully.`,
-      error: `Failed to delete question in questionnaire ${questionnaire.title}.`,
-    });
-    const response = await promise;
-    if (!response.ok) {
-      return response;
-    }
-  }
-
-  for (const [index, question] of questionnaire.questions.entries()) {
-    question.questionnaire_id = questionnaire.id;
-
-    if (question.id === "") {
-      const promise = post(
-        `${import.meta.env.VITE_QUESTIONNAIRE_API_URL}questions`,
-        question
-      );
-      AddToastPromise(promise, {
-        loading: `Adding question ${index + 1} to questionnaire ${questionnaire.title}...`,
-        success: `Question ${index + 1} added to questionnaire ${questionnaire.title} successfully.`,
-        error: `Failed to add question ${index + 1} to questionnaire ${questionnaire.title}.`,
-      });
-      const response = await promise;
-      if (!response.ok) {
-        return response;
-      }
-    } else {
-      const promise = put(
-        `${import.meta.env.VITE_QUESTIONNAIRE_API_URL}questions/${question.id}`,
-        question
-      );
-      AddToastPromise(promise, {
-        loading: `Updating question ${index + 1} in questionnaire ${questionnaire.title}...`,
-        success: `Question ${index + 1} in questionnaire ${questionnaire.title} updated successfully.`,
-        error: `Failed to update question ${index + 1} in questionnaire ${questionnaire.title}.`,
-      });
-      const response = await promise;
-      if (!response.ok) {
-        return response;
-      }
-    }
-  }
+): Promise<boolean> => {
+  console.log(
+    "to do: implement UpdateQuestionsInQuestionnaire",
+    questionnaire,
+    deleteIds
+  );
+  return false;
 };
 
-export const CreateQuestionnaire = async (questionnaire: Questionnaire) => {
-  const promise = post(
-    `${import.meta.env.VITE_QUESTIONNAIRE_API_URL}questionnaires`,
-    questionnaire
+export const CreateQuestionnaire = async (
+  questionnaire: Questionnaire
+): Promise<boolean> => {
+  const toastUpdater = AddToastPromise(
+    `Creating questionnaire ${questionnaire.title}...`
   );
-  AddToastPromise(promise, {
-    loading: `Creating questionnaire ${questionnaire.title}...`,
-    success: `Questionnaire ${questionnaire.title} created successfully.`,
-    error: `Failed to create questionnaire ${questionnaire.title}.`,
-  });
-  return await promise;
+
+  try {
+    const response = await post(
+      `${import.meta.env.VITE_QUESTIONNAIRE_API_URL}questionnaires`,
+      questionnaire,
+      {
+        headers: {
+          Authorization: `Bearer ${get(jwtStore)}`,
+        },
+      }
+    );
+    if (response.ok) {
+      toastUpdater(
+        `Questionnaire ${questionnaire.title} created successfully.`,
+        "success"
+      );
+      return true;
+    } else {
+      toastUpdater(
+        `Failed to create questionnaire ${questionnaire.title}.`,
+        "error"
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error("Error creating questionnaire:", error);
+    toastUpdater(
+      `Failed to create questionnaire ${questionnaire.title}.`,
+      "error"
+    );
+    return false;
+  }
 };
