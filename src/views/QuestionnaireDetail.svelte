@@ -6,10 +6,9 @@
     CreateQuestionnaire,
     DeleteQuestionnaire,
     UpdateQuestionnaire,
-    UpdateQuestionsInQuestionnaire,
   } from "../util/questionnaire";
   import { goTo } from "../stores/router";
-  import { AddToast, AddToastPromise } from "../util/toast";
+  import { getTopicColor, topicStore } from "../stores/topics";
 
   let questionnaireId: string = $state("");
   let originalQuestionnaire: Questionnaire | null = $state(null);
@@ -17,9 +16,9 @@
   let title = $state("");
   let color = $state<MPHColors>("blue");
   let questions = $state<Question[]>([]);
-  let deleteIds = $state<string[]>([]);
 
   let loading = $state(true);
+  let questionsHidden = $state(false);
 
   const editedQuestionnaire: Questionnaire = $derived({
     id: questionnaireId,
@@ -68,12 +67,48 @@
     if (originalQuestionnaire) {
       title = originalQuestionnaire.title;
       color = originalQuestionnaire.color;
-      questions = originalQuestionnaire.questions;
+      questions = [];
+      for (const q of originalQuestionnaire.questions) {
+        questions.push({ ...q });
+      }
     }
   };
 </script>
 
 <h2>Questionnaire Details</h2>
+
+<section class="controls">
+  <button
+    type="button"
+    style="--color: var(--c-blue)"
+    disabled={loading}
+    onclick={() => {
+      questions = [
+        ...questions,
+        {
+          id: "",
+          content: "",
+          topic_id: "",
+          questionnaire_id: questionnaireId,
+        },
+      ];
+    }}
+  >
+    Add Question
+  </button>
+
+  <button
+    type="button"
+    style="--color: var(--c-{questionsHidden ? 'green' : 'red'})"
+    disabled={loading}
+    onclick={() => {
+      questionsHidden = !questionsHidden;
+    }}
+  >
+    {questionsHidden ? "Show Questions" : "Hide Questions"}
+  </button>
+</section>
+
 <form>
   <label for="title">Title:</label>
   <input type="text" id="title" bind:value={title} disabled={loading} />
@@ -92,10 +127,37 @@
     <option value="purple" style="--color: var(--c-purple)">Purple</option>
   </select>
 
-  {#each questions as question}
-    <label> Question: {question.content}</label>
-    <div class="question-block"> not implemented yet </div>
-  {/each}
+  <span class="question-count">Total Questions: {questions.length}</span>
+  {#if !questionsHidden}
+    {#each questions as question, index}
+      <div class="question-block">
+        <span>Question {index + 1} Text:</span>
+        <input type="text" bind:value={question.content} disabled={loading} />
+        <span>Question {index + 1} Topic:</span>
+        <select
+          bind:value={question.topic_id}
+          disabled={loading}
+          style="--background: var(--c-{getTopicColor(question.topic_id)})"
+        >
+          {#each $topicStore as topic}
+            <option style="--color: var(--c-{topic.color})" value={topic.id}
+              >{topic.name}</option
+            >
+          {/each}
+        </select>
+        <button
+          type="button"
+          class="danger"
+          disabled={loading}
+          onclick={() => {
+            questions = questions.filter((q) => q !== question);
+          }}
+        >
+          Delete Question
+        </button>
+      </div>
+    {/each}
+  {/if}
 
   <button
     type="button"
@@ -125,6 +187,7 @@
   {:else}
     <button
       type="button"
+      class="save"
       disabled={loading}
       onclick={async () => {
         loading = true;
@@ -152,3 +215,29 @@
     Delete Questionnaire
   </button>
 </form>
+
+<style>
+  .controls {
+    margin: 1rem;
+  }
+
+  .question-block {
+    border: 1px solid var(--c-foreground);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--c-background);
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .question-count {
+    font-weight: bold;
+  }
+
+  form {
+    width: min(60rem, 90%);
+  }
+</style>

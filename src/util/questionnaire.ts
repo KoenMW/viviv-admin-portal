@@ -89,25 +89,6 @@ export const UpdateQuestionnaire = async (
   }
 };
 
-/**
- * Updates questions in a questionnaire, including deleting specified questions.
- * only returns a response if an error occurs.
- * @param questionnaire
- * @param deleteIds
- * @returns
- */
-export const UpdateQuestionsInQuestionnaire = async (
-  questionnaire: Questionnaire,
-  deleteIds: string[]
-): Promise<boolean> => {
-  console.log(
-    "to do: implement UpdateQuestionsInQuestionnaire",
-    questionnaire,
-    deleteIds
-  );
-  return false;
-};
-
 export const CreateQuestionnaire = async (
   questionnaire: Questionnaire
 ): Promise<boolean> => {
