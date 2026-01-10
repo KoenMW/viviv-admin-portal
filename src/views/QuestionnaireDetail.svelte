@@ -203,6 +203,7 @@
   {/if}
   <button
     type="button"
+    class="danger"
     onclick={async () => {
       loading = true;
       const success = await DeleteQuestionnaire(editedQuestionnaire);
@@ -222,7 +223,7 @@
     padding: 2.5rem;
     position: sticky;
     top: 0;
-    width: 120%;
+    width: calc(100% + 4rem);
     display: flex;
     gap: 1rem;
     justify-content: center;
