@@ -61,14 +61,17 @@
 
 <style>
   main {
-    --margin: 2rem;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 2rem 2rem 2rem;
+    margin-top: 2rem;
     display: flex;
     flex-direction: column;
-    width: calc(100% - var(--margin) * 2);
-    height: calc(100dvh - var(--margin) * 2);
+    height: 100dvh;
     align-items: center;
     justify-content: flex-start;
-    margin: var(--margin);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   header {

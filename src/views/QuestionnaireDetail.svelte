@@ -219,6 +219,15 @@
 <style>
   .controls {
     margin: 1rem;
+    padding: 2.5rem;
+    position: sticky;
+    top: 0;
+    width: 120%;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    background: var(--c-background);
+    z-index: 10;
   }
 
   .question-block {
