@@ -4,9 +4,8 @@
 
 <h1>Home</h1>
 <section>
-  <Link path="users" color="blue">Manage Users</Link>
-  <Link path="questionnaires" color="blue">Manage Questionnaires</Link>
-  <Link path="results" color="blue">View Results</Link>
+  <Link path="usersManagement" color="blue">Manage Users</Link>
+  <Link path="questionnaireManagement" color="blue">Manage Questionnaires</Link>
 </section>
 
 <style>

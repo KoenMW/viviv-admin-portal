@@ -4,36 +4,43 @@ import { writable } from "svelte/store";
 import { routeParam } from "../consts";
 import Login from "../views/Login.svelte";
 import Register from "../views/Register.svelte";
+import UserManagement from "../views/UserManagement.svelte";
+import UserDetail from "../views/UserDetail.svelte";
 
-export type Routes = Record<string, Component>;
+export type Routes = Record<Paths, Component>;
 
 export type Paths =
   | ""
-  | "questionnaires"
-  | "results"
+  | "questionnaireManagement"
+  | "questionnaireDetails"
   | "login"
   | "register"
-  | "users";
+  | "usersManagement"
+  | "userDetails";
 
 export const routes: Routes = {
   "": Home,
   login: Login,
   register: Register,
+  usersManagement: UserManagement,
+  userDetails: UserDetail,
+  questionnaireManagement: Home,
+  questionnaireDetails: Home,
 };
 
-export const route = writable<string>("");
+export const route = writable<Paths>("");
 
 const setRouteAndParams = () => {
   const searchParams = new URLSearchParams(location.search);
-  route.set(searchParams.get(routeParam) ?? "");
+  route.set((searchParams.get(routeParam) as Paths) ?? "");
 };
 
-export const goTo = (route: Paths) => {
+export const goTo = (destination: Paths) => {
   const url = new URL(globalThis.location.href);
-  url.searchParams.set(routeParam, route);
+  url.searchParams.set(routeParam, destination);
 
   history.pushState({}, "", url);
-  window.location.reload();
+  setRouteAndParams();
 };
 
 setRouteAndParams();
