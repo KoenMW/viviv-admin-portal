@@ -6,6 +6,7 @@
   import Link from "./lib/common/Link.svelte";
   import { type Component } from "svelte";
   import { logout, refreshToken } from "./util/api";
+  import Scroll from "./lib/common/Scroll.svelte";
 
   type pageType = {
     component: Component;
@@ -57,21 +58,25 @@
   {#if page}
     <page.component />
   {/if}
+  <Scroll />
 </main>
 
 <style>
   main {
-    --margin: 2rem;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 2rem 2rem 2rem;
     display: flex;
     flex-direction: column;
-    width: calc(100% - var(--margin) * 2);
-    height: calc(100dvh - var(--margin) * 2);
+    height: 100dvh;
     align-items: center;
     justify-content: flex-start;
-    margin: var(--margin);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   header {
+    margin-top: 2rem;
     width: 100%;
     position: sticky;
 

@@ -29,20 +29,3 @@
     </div>
   </td>
 </tr>
-
-<style>
-  td {
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    text-align: left;
-  }
-
-  .delete {
-    --color: var(--c-red);
-  }
-
-  .actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-</style>
