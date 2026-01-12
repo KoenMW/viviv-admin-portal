@@ -140,6 +140,7 @@ form {
   padding: 2rem;
   box-shadow: 0 0 1rem var(--c-foreground);
   border-radius: 1rem;
+  margin: 1rem;
 }
 
 label {
