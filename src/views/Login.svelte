@@ -3,7 +3,7 @@
   import { jwtStore } from "../stores/jwt";
   import { goTo } from "../stores/router";
   import { get, post } from "../util/api";
-  import { AddToast, AddToastPromise } from "../util/toast";
+  import { AddToastPromise } from "../util/toast";
 
   let email: string = $state("");
   let password: string = $state("");
@@ -45,6 +45,7 @@
       loading = true;
 
       const promise = new Promise<void>(async (resolve, reject) => {
+        const updateToast = AddToastPromise("Logging in...");
         try {
           const response = await post(
             `${import.meta.env.VITE_USER_API_URL}auth/login`,
@@ -57,13 +58,13 @@
           if (response.ok) {
             const data = await response.json();
             if (!data.token || typeof data.token !== "string") {
-              AddToast("Invalid response from server.", "error");
+              updateToast("Invalid response from server.", "error");
               reject("Invalid response from server.");
               return;
             }
             const isAdmin = await validateAdminToken();
             if (!isAdmin) {
-              AddToast("You do not have admin privileges.", "error");
+              updateToast("You do not have admin privileges.", "error");
               reject("You do not have admin privileges.");
               return;
             }
@@ -71,29 +72,24 @@
             jwtStore.set(data.token);
             goTo("");
           } else if (response.status === 401) {
-            AddToast("Invalid email or password.", "error");
+            updateToast("Invalid email or password.", "error");
             reject("Invalid email or password.");
             return;
           } else {
-            AddToast("An error occurred. Please try again later.", "error");
+            updateToast("An error occurred. Please try again later.", "error");
             reject("An error occurred. Please try again later.");
             return;
           }
+          updateToast("Logged in successfully!", "success");
           resolve();
         } catch (error) {
           console.error("Login error:", error);
-          AddToast("An error occurred. Please try again later.", "error");
+          updateToast("An error occurred. Please try again later.", "error");
           reject(error);
           return;
         } finally {
           loading = false;
         }
-      });
-
-      AddToastPromise(promise, {
-        loading: "Logging in...",
-        success: "Logged in successfully!",
-        error: "Login failed.",
       });
 
       await promise;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Link from "../lib/common/Link.svelte";
   import { post } from "../util/api";
-  import { AddToast, AddToastPromise } from "../util/toast";
+  import { AddToastPromise } from "../util/toast";
 
   let email: string = $state("");
   let password: string = $state("");
@@ -25,6 +25,8 @@
 
     loading = true;
 
+    const updateToast = AddToastPromise("Registering...");
+
     const promise = new Promise<void>(async (resolve, reject) => {
       try {
         const response = await post(
@@ -39,27 +41,23 @@
         if (response.ok) {
           registered = true;
         } else if (response.status === 400) {
-          AddToast("Invalid email or password.", "error");
+          updateToast("Invalid email or password.", "error");
           reject("Invalid email or password.");
         } else {
-          AddToast("An error occurred. Please try again later.", "error");
+          updateToast("An error occurred. Please try again later.", "error");
           reject("An error occurred. Please try again later.");
         }
+        updateToast("Registered successfully!", "success");
         resolve();
       } catch (error) {
         console.error("Registration error:", error);
-        AddToast("An error occurred. Please try again later.", "error");
+        updateToast("An error occurred. Please try again later.", "error");
         reject(error);
       } finally {
         loading = false;
       }
     });
 
-    AddToastPromise(promise, {
-      loading: "Registering...",
-      success: "Registration successful!",
-      error: "Registration failed.",
-    });
     await promise;
   };
 </script>
