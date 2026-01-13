@@ -20,6 +20,8 @@
   let loading = $state(true);
   let questionsHidden = $state(false);
 
+  let form: HTMLFormElement | null = $state(null);
+
   const editedQuestionnaire: Questionnaire = $derived({
     id: questionnaireId,
     title,
@@ -73,6 +75,28 @@
       }
     }
   };
+
+  const submitForm = async (event: Event) => {
+    if (!form) {
+      throw new Error("Form element not found");
+    }
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    event.preventDefault();
+
+    loading = true;
+    const success = questionnaireId
+      ? await UpdateQuestionnaire(editedQuestionnaire)
+      : await CreateQuestionnaire(editedQuestionnaire);
+    loading = false;
+    if (success) {
+      goTo("questionnaireManagement");
+    }
+  };
 </script>
 
 <h2>Questionnaire Details</h2>
@@ -86,7 +110,7 @@
       questions = [
         ...questions,
         {
-          id: "",
+          id: "00000000-0000-0000-0000-000000000000",
           content: "",
           topic_id: "",
           questionnaire_id: questionnaireId,
@@ -109,15 +133,22 @@
   </button>
 </section>
 
-<form>
+<form bind:this={form}>
   <label for="title">Title:</label>
-  <input type="text" id="title" bind:value={title} disabled={loading} />
+  <input
+    type="text"
+    id="title"
+    bind:value={title}
+    disabled={loading}
+    required
+  />
   <label for="color">Color:</label>
   <select
     id="color"
     style="--background: var(--c-{color})"
     bind:value={color}
     disabled={loading}
+    required
   >
     <option value="blue" style="--color: var(--c-blue)">Blue</option>
     <option value="red" style="--color: var(--c-red)">Red</option>
@@ -132,12 +163,37 @@
     {#each questions as question, index}
       <div class="question-block">
         <span>Question {index + 1} Text:</span>
-        <input type="text" bind:value={question.content} disabled={loading} />
+        <input
+          bind:value={question.content}
+          type="text"
+          disabled={loading}
+          required
+          oninput={(e) => {
+            questions = questions.map((q, i) => {
+              if (i === index) {
+                return { ...q, content: (e.target as HTMLInputElement).value };
+              }
+              return q;
+            });
+          }}
+        />
         <span>Question {index + 1} Topic:</span>
         <select
           bind:value={question.topic_id}
           disabled={loading}
           style="--background: var(--c-{getTopicColor(question.topic_id)})"
+          required
+          onchange={(e) => {
+            questions = questions.map((q, i) => {
+              if (i === index) {
+                return {
+                  ...q,
+                  topic_id: (e.target as HTMLSelectElement).value,
+                };
+              }
+              return q;
+            });
+          }}
         >
           {#each $topicStore as topic}
             <option style="--color: var(--c-{topic.color})" value={topic.id}
@@ -168,39 +224,11 @@
     Discard Changes
   </button>
 
-  {#if questionnaireId}
-    <button
-      type="submit"
-      class="save"
-      disabled={!isDirty || loading}
-      onclick={async () => {
-        loading = true;
-        const success = await UpdateQuestionnaire(editedQuestionnaire);
-        loading = false;
-        if (success) {
-          goTo("questionnaireManagement");
-        }
-      }}
-    >
-      Save Changes
-    </button>
-  {:else}
-    <button
-      type="button"
-      class="save"
-      disabled={loading}
-      onclick={async () => {
-        loading = true;
-        const success = await CreateQuestionnaire(editedQuestionnaire);
-        loading = false;
-        if (success) {
-          goTo("questionnaireManagement");
-        }
-      }}
-    >
-      Create Questionnaire
-    </button>
-  {/if}
+  <button type="submit" class="save" disabled={loading} onclick={submitForm}>
+    {#if questionnaireId}Save Changes
+    {:else}Create Questionnaire
+    {/if}
+  </button>
   <button
     type="button"
     class="danger"

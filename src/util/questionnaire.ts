@@ -53,6 +53,8 @@ export const DeleteQuestionnaire = async (
 export const UpdateQuestionnaire = async (
   questionnaire: Questionnaire
 ): Promise<boolean> => {
+  console.log("Updating questionnaire:", questionnaire);
+
   const toastUpdater = AddToastPromise(
     `Updating questionnaire ${questionnaire.title}...`
   );

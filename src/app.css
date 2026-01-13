@@ -265,13 +265,14 @@ td {
 select {
   --background : var(--c-background);
   padding: 0.5rem;
-  border: 0.1rem solid transparent;
+  border: 0.1rem solid var(--c-foreground);
+  color: var(--c-foreground);
   border-radius: 0.5rem;
   font-size: 1rem;
   background-color: var(--background);
 }
 
 option {
-  --color: var(--c-foreground);
+  --color: var(--c-background);
   background-color: var(--color);
 }

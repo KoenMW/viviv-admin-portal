@@ -16,6 +16,8 @@
 
   let loading = $state(true);
 
+  let form: HTMLFormElement | null = $state(null);
+
   const editedUser: User = $derived({
     id: userId,
     name,
@@ -38,7 +40,7 @@
     return (
       name.trim() !== "" &&
       email.trim() !== "" &&
-      role_id !== -1 &&
+      (userId ? role_id !== -1 : true) &&
       (userId ? true : password.trim() !== "")
     );
   });
@@ -78,14 +80,43 @@
       password = "";
     }
   };
+
+  const submitForm = async (event: Event) => {
+    if (!form) {
+      throw new Error("Form element not found");
+    }
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    event.preventDefault();
+
+    loading = true;
+    const response = userId
+      ? await UpdateUser(editedUser)
+      : await CreateUser(editedUser);
+    loading = false;
+    if (response.ok) {
+      userId && (originalUser = { ...editedUser });
+      goTo("usersManagement");
+    }
+  };
 </script>
 
 <h2>User Details</h2>
-<form>
+<form bind:this={form}>
   <label for="name"> Name: </label>
-  <input type="text" id="name" disabled={loading} bind:value={name} />
+  <input type="text" id="name" disabled={loading} bind:value={name} required />
   <label for="email"> Email: </label>
-  <input type="email" id="email" disabled={loading} bind:value={email} />
+  <input
+    type="email"
+    id="email"
+    disabled={loading}
+    bind:value={email}
+    required
+  />
   {#if !userId}
     <label for="password"> Password: </label>
     <input
@@ -93,17 +124,21 @@
       id="password"
       disabled={loading}
       bind:value={password}
+      required
+      minlength="8"
     />
   {/if}
-  <label for="role"> Role: </label>
-  {#if $rolesStore && $rolesStore.length > 0}
-    <select id="role" disabled={loading} bind:value={role_id}>
-      {#each $rolesStore as role}
-        <option value={role.id}>{role.name}</option>
-      {/each}
-    </select>
-  {:else}
-    <p>Loading roles...</p>
+  {#if userId}
+    {#if $rolesStore && $rolesStore.length > 0}
+      <label for="role"> Role: </label>
+      <select id="role" disabled={loading} bind:value={role_id} required>
+        {#each $rolesStore as role}
+          <option value={role.id}>{role.name}</option>
+        {/each}
+      </select>
+    {:else}
+      <p>Loading roles...</p>
+    {/if}
   {/if}
 
   <button
@@ -114,36 +149,16 @@
   >
     Discard Changes
   </button>
-  {#if userId}
-    <button
-      type="button"
-      class="save"
-      disabled={!isDirty || !validUser || loading}
-      onclick={async () => {
-        loading = true;
-        const response = await UpdateUser(editedUser);
-        loading = false;
-        if (response.ok) {
-          originalUser = { ...editedUser };
-        }
-      }}
-    >
-      Save Changes
-    </button>
-  {:else}
-    <button
-      type="button"
-      class="save"
-      disabled={!validUser || loading}
-      onclick={async () => {
-        loading = true;
-        const response = await CreateUser(editedUser);
-        loading = false;
-      }}
-    >
-      Create User
-    </button>
-  {/if}
+  <button
+    type="submit"
+    class="save"
+    disabled={!validUser || loading}
+    onclick={submitForm}
+  >
+    {#if userId}Save Changes
+    {:else}Create User
+    {/if}
+  </button>
   <button
     type="button"
     class="danger"
