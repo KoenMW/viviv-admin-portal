@@ -8,6 +8,8 @@ import UserManagement from "../views/UserManagement.svelte";
 import UserDetail from "../views/UserDetail.svelte";
 import QuestionnaireManagement from "../views/QuestionnaireManagement.svelte";
 import QuestionnaireDetail from "../views/QuestionnaireDetail.svelte";
+import ProviderManagement from "../views/ProviderManagement.svelte";
+import ProviderDetails from "../views/ProviderDetail.svelte"
 
 export type Routes = Record<Paths, Component>;
 
@@ -18,7 +20,9 @@ export type Paths =
   | "login"
   | "register"
   | "usersManagement"
-  | "userDetails";
+  | "userDetails"
+  | "providerManagement"
+  | "providerDetails";
 
 export const routes: Routes = {
   "": Home,
@@ -28,6 +32,8 @@ export const routes: Routes = {
   userDetails: UserDetail,
   questionnaireManagement: QuestionnaireManagement,
   questionnaireDetails: QuestionnaireDetail,
+  providerManagement: ProviderManagement,
+  providerDetails: ProviderDetails,
 };
 
 export const route = writable<Paths>("");

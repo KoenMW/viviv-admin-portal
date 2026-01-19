@@ -49,3 +49,17 @@ export type User = {
   role_id: number;
   role: string;
 };
+
+export type Provider = {
+    id: string;
+    name: string;
+    city: string;
+    postcode: string;
+    street: string;
+    houseNumber: string;
+    category: string;
+    coords: {
+        X: number;
+        Y: number;
+    };
+}
