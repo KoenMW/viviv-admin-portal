@@ -31,7 +31,17 @@
       const response = await get<Provider[]>(
         `${import.meta.env.VITE_PROVIDER_API_URL}providers?page=${page}&per_page=${perPage}`
       );
-      providers = response;
+      coordProviders = response;
+      providers = response.map((p): FormProvider => ({
+              id = p.id,
+              city = p.city,
+              postcode = p.postcode,
+              street = p.street,
+              houseNumber = p.houseNumber,
+              category = p.category,
+              latitude = p.coords.X,
+              longitude = p.coords.Y
+          }))
       totalProviders = await getProviderCount();
     } catch (error) {
       console.error("Error fetching providers:", error);
@@ -78,14 +88,14 @@
     <thead>
       <tr>
         <th class="hidden-small">ID</th>
-        <th>Username</th>
-        <th class="hidden-small">Name</th>
+        <th>Name</th>
         <th class="hidden-small">City</th>
         <th class="hidden-small">Postcode</th>
         <th class="hidden-small">Street</th>
         <th class="hidden-small">House Number</th>
         <th class="hidden-small">Category</th>
-        <th class="hidden-small">Location</th>
+        <th class="hidden-small">Latitude</th>
+        <th class="hidden-small">Longitude</th>
         <th>Actions</th>
       </tr>
     </thead>

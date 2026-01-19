@@ -43,6 +43,7 @@ jobs:
         env:
           VITE_QUESTIONNAIRE_API_URL: ${{ secrets.VITE_QUESTIONNAIRE_API_URL }}
           VITE_USER_API_URL: ${{ secrets.VITE_USER_API_URL }}
+          VITE_PROVIDER_API_URL: ${{ secrets.VITE_PROVIDER_API_URL }}
         run: npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

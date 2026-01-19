@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Provider } from "../../types";
+  import type { Provider, FormProvider } from "../../types";
   import { DeleteProvider } from "../../util/provider";
   import Link from "../common/Link.svelte";
 
   type props = {
-    user: Provider;
+    provider: FormProvider;
     refresh: () => void;
   };
 
@@ -19,7 +19,8 @@
   <td class="hidden-small">{provider.street}</td>
   <td class="hidden-small">{provider.houseNumber}</td>
   <td class="hidden-small">{provider.category}</td>
-  <td class="hidden-small">{provider.coords}</td>
+  <td class="hidden-small">{provider.latitude}</td>
+  <td class="hidden-small">{provider.longitude}</td>
   <td>
     <div class="actions">
       <Link path="providerDetails" params={{ id: provider.id }} color="blue">Edit</Link
