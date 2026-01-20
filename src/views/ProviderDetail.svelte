@@ -23,6 +23,7 @@
   let form: HTMLFormElement | null = $state(null);
 
   const editedProvider: FormProvider = $derived({
+    id: providerId,
     name,
     city,
     postcode,
@@ -47,6 +48,38 @@
     );
   });
 
+  onMount(async () => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      providerId = urlParams.get("id") || "";
+
+      if (!providerId) {
+        console.error("Provider ID is missing in URL parameters.");
+        return;
+      }
+
+      if (providerId) {
+        const response = await get<Provider>(
+          `${import.meta.env.VITE_PROVIDER_API_URL}providers/${providerId}`
+        );
+        originalProvider = response;
+        providerId = response.id;
+        name = response.name;
+        city = response.city;
+        postcode = response.postcode;
+        street = response.street;
+        houseNumber = response.houseNumber;
+        category = response.category;
+        latitude = response.coords.X;
+        longitude = response.coords.Y;
+      }
+    } catch (error) {
+      console.error("Error fetching provider details:", error);
+    } finally {
+      loading = false;
+    }
+  });
+
   let validProvider: boolean = $derived.by(() => {
     return (
     name.trim() !== "" &&
@@ -60,37 +93,6 @@
     );
   });
 
-  // onMount(async () => {
-  //   try {
-  //     const urlParams = new URLSearchParams(window.location.search);
-  //     providerId = urlParams.get("id") || "";
-  //
-  //     if (!providerId) {
-  //       console.error("Provider ID is missing in URL parameters.");
-  //       return;
-  //     }
-  //
-  //     if (providerId) {
-  //       const response = await get<Provider>(
-  //         `${import.meta.env.VITE_PROVIDER_API_URL}/providers/${providerId}`
-  //       );
-  //       originalProvider = response;
-  //       name = response.name
-  //       city = response.city
-  //       postcode = response.postcode
-  //       street = response.street
-  //       houseNumber = response.houseNumber
-  //       category = response.category
-  //       coords.X = response.coords.X
-  //       coords.Y = response.coords.Y
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching provider details:", error);
-  //   } finally {
-  //     loading = false;
-  //   }
-  // });
-
   const discardChanges = () => {
     if (originalProvider) {
       name = originalProvider.name
@@ -99,7 +101,8 @@
       street = originalProvider.street
       houseNumber = originalProvider.houseNumber
       category = originalProvider.category
-      latitude = originalProvider.longitude
+      latitude = originalProvider.latitude
+      longitude = originalProvider.longitude
     }
   };
 

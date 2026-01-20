@@ -31,9 +31,10 @@
       const response = await get<Provider[]>(
         `${import.meta.env.VITE_PROVIDER_API_URL}providers?page=${page}&per_page=${perPage}`
       );
-      coordProviders = response;
+      let coordProviders = response;
       providers = response.map((p): FormProvider => ({
               id: p.id,
+              name: p.name,
               city: p.city,
               postcode: p.postcode,
               street: p.street,

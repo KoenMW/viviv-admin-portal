@@ -60,6 +60,7 @@ export const UpdateProvider = async (
   );
   try {
     let coordsProvider = {
+        id: provider.id,
         name: provider.name,
         city: provider.city,
         postcode: provider.postcode,
@@ -67,8 +68,8 @@ export const UpdateProvider = async (
         houseNumber: provider.houseNumber,
         category: provider.category,
         coords: {
-            X: provider.latitude,
-            Y: provider.longitude,
+            X: Number(provider.latitude),
+            Y: Number(provider.longitude),
         }
     }
     const response = await put(
@@ -118,8 +119,10 @@ export const CreateProvider = async (
             street: provider.street,
             houseNumber: provider.houseNumber,
             category: provider.category,
-            latitude: provider.latitude,
-            longitude: provider.longitude,
+            coords: {
+                X: Number(provider.latitude),
+                Y: Number(provider.longitude),
+            }
 
         }
     const response = await post(
