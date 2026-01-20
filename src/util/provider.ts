@@ -118,10 +118,8 @@ export const CreateProvider = async (
             street: provider.street,
             houseNumber: provider.houseNumber,
             category: provider.category,
-            coords: {
-                X: provider.latitude,
-                Y: provider.longitude,
-            }
+            latitude: provider.latitude,
+            longitude: provider.longitude,
 
         }
     const response = await post(

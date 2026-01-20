@@ -1,13 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { Provider } from "../types";
+  import type { Provider, FormProvider } from "../types";
   import { get } from "../util/api";
   import { goTo } from "../stores/router";
   import { rolesStore } from "../stores/roles";
   import { CreateProvider, DeleteProvider, UpdateProvider } from "../util/provider";
 
   let providerId: string = $state("");
-  let originalProvider: Provider | null = $state(null);
+  let originalProvider: FormProvider | null = $state(null);
 
   let name = $state("");
   let city = $state("");
@@ -15,21 +15,22 @@
   let street = $state("");
   let houseNumber = $state("");
   let category = $state("");
-  let coords = $state({X: 0.0, Y: 0.0});
+  let latitude = $state(0.0);
+  let longitude = $state(0.0);
 
-  let loading = $state(true);
+  let loading = $state(false);
 
   let form: HTMLFormElement | null = $state(null);
 
-  const editedProvider: Provider = $derived({
-    id: providerId,
+  const editedProvider: FormProvider = $derived({
     name,
     city,
     postcode,
     street,
     houseNumber,
     category,
-    coords,
+    latitude,
+    longitude,
   });
 
   let isDirty: boolean = $derived.by(() => {
@@ -41,8 +42,8 @@
       originalProvider.street !== street ||
       originalProvider.houseNumber !== houseNumber ||
       originalProvider.category !== category ||
-      originalProvider.coords.X !== coords.X ||
-      originalProvider.coords.Y !== coords.Y
+      originalProvider.latitude !== latitude ||
+      originalProvider.longitude !== longitude
     );
   });
 
@@ -54,41 +55,41 @@
     street.trim() !== "" &&
     houseNumber.trim() !== "" &&
     category.trim() !== "" &&
-    coords.X !== 0.0 &&
-    coords.Y !== 0.0
+    latitude !== 0.0 &&
+    longitude !== 0.0
     );
   });
 
-  onMount(async () => {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      providerId = urlParams.get("id") || "";
-
-      if (!providerId) {
-        console.error("Provider ID is missing in URL parameters.");
-        return;
-      }
-
-      if (providerId) {
-        const response = await get<Provider>(
-          `${import.meta.env.VITE_PROVIDER_API_URL}/providers/${providerId}`
-        );
-        originalProvider = response;
-        name = response.name
-        city = response.city
-        postcode = response.postcode
-        street = response.street
-        houseNumber = response.houseNumber
-        category = response.category
-        coords.X = response.coords.X
-        coords.Y = response.coords.Y
-      }
-    } catch (error) {
-      console.error("Error fetching provider details:", error);
-    } finally {
-      loading = false;
-    }
-  });
+  // onMount(async () => {
+  //   try {
+  //     const urlParams = new URLSearchParams(window.location.search);
+  //     providerId = urlParams.get("id") || "";
+  //
+  //     if (!providerId) {
+  //       console.error("Provider ID is missing in URL parameters.");
+  //       return;
+  //     }
+  //
+  //     if (providerId) {
+  //       const response = await get<Provider>(
+  //         `${import.meta.env.VITE_PROVIDER_API_URL}/providers/${providerId}`
+  //       );
+  //       originalProvider = response;
+  //       name = response.name
+  //       city = response.city
+  //       postcode = response.postcode
+  //       street = response.street
+  //       houseNumber = response.houseNumber
+  //       category = response.category
+  //       coords.X = response.coords.X
+  //       coords.Y = response.coords.Y
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching provider details:", error);
+  //   } finally {
+  //     loading = false;
+  //   }
+  // });
 
   const discardChanges = () => {
     if (originalProvider) {
@@ -98,7 +99,7 @@
       street = originalProvider.street
       houseNumber = originalProvider.houseNumber
       category = originalProvider.category
-      coords = originalProvider.coords
+      latitude = originalProvider.longitude
     }
   };
 
@@ -146,11 +147,11 @@
   <label for="category"> Category: </label>
   <input type="text" id="category" disabled={loading} bind:value={category} required />
 
-  <label for="coords"> Latitude: </label>
-  <input type="text" id="latitude" disabled={loading} bind:value={coords.X} required />
+  <label for="latitude"> Latitude: </label>
+  <input type="text" id="latitude" disabled={loading} bind:value={latitude} required />
 
-  <label for="name"> Longitude: </label>
-  <input type="text" id="longitude" disabled={loading} bind:value={coords.Y} required />
+  <label for="longitude"> Longitude: </label>
+  <input type="text" id="longitude" disabled={loading} bind:value={longitude} required />
 
 
   <button

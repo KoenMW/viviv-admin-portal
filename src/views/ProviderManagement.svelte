@@ -33,14 +33,14 @@
       );
       coordProviders = response;
       providers = response.map((p): FormProvider => ({
-              id = p.id,
-              city = p.city,
-              postcode = p.postcode,
-              street = p.street,
-              houseNumber = p.houseNumber,
-              category = p.category,
-              latitude = p.coords.X,
-              longitude = p.coords.Y
+              id: p.id,
+              city: p.city,
+              postcode: p.postcode,
+              street: p.street,
+              houseNumber: p.houseNumber,
+              category: p.category,
+              latitude: p.coords.X,
+              longitude: p.coords.Y,
           }))
       totalProviders = await getProviderCount();
     } catch (error) {
@@ -107,4 +107,3 @@
   </table>
 
   <p>Total Providers: {totalProviders}</p>
-{/if}
