@@ -151,10 +151,10 @@
   <input type="text" id="category" disabled={loading} bind:value={category} required />
 
   <label for="latitude"> Latitude: </label>
-  <input type="text" id="latitude" disabled={loading} bind:value={latitude} required />
+  <input type="number" step="0.01" id="latitude" disabled={loading} bind:value={latitude} required />
 
   <label for="longitude"> Longitude: </label>
-  <input type="text" id="longitude" disabled={loading} bind:value={longitude} required />
+  <input type="number" step="0.01" id="longitude" disabled={loading} bind:value={longitude} required />
 
 
   <button
