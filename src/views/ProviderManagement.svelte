@@ -1,22 +1,22 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { Provider } from "../types";
+  import type { FormProvider, Provider } from "../types";
   import { get } from "../util/api";
   import ProviderRow from "../lib/providers/ProviderRow.svelte";
   import Link from "../lib/common/Link.svelte";
-  import { fetchRoles, rolesStore } from "../stores/roles";
+  import { toFormProvider } from "../util/provider";
 
   let page: number = $state(1);
   let perPage: number = $state(10);
   let totalProviders: number = $state(0);
 
-  let providers: Provider[] = $state([]);
+  let providers: FormProvider[] = $state([]);
   let loading: boolean = $state(false);
 
   const getProviderCount = async (): Promise<number> => {
     try {
       const response = await get<{ count: number }>(
-        `${import.meta.env.VITE_PROVIDER_API_URL}providers/count`
+        `${import.meta.env.VITE_PROVIDER_API_URL}providers/count`,
       );
       return response.count;
     } catch (error) {
@@ -29,20 +29,9 @@
     try {
       loading = true;
       const response = await get<Provider[]>(
-        `${import.meta.env.VITE_PROVIDER_API_URL}providers?page=${page}&per_page=${perPage}`
+        `${import.meta.env.VITE_PROVIDER_API_URL}providers?page=${page}&per_page=${perPage}`,
       );
-      let coordProviders = response;
-      providers = response.map((p): FormProvider => ({
-              id: p.id,
-              name: p.name,
-              city: p.city,
-              postcode: p.postcode,
-              street: p.street,
-              houseNumber: p.houseNumber,
-              category: p.category,
-              latitude: p.coords.X,
-              longitude: p.coords.Y,
-          }))
+      providers = response.map((p) => toFormProvider(p));
       totalProviders = await getProviderCount();
     } catch (error) {
       console.error("Error fetching providers:", error);
@@ -85,26 +74,26 @@
   <Link path="providerDetails" color="green">Add New Provider</Link>
 </section>
 
-  <table>
-    <thead>
-      <tr>
-        <th class="hidden-small">ID</th>
-        <th>Name</th>
-        <th class="hidden-small">City</th>
-        <th class="hidden-small">Postcode</th>
-        <th class="hidden-small">Street</th>
-        <th class="hidden-small">House Number</th>
-        <th class="hidden-small">Category</th>
-        <th class="hidden-small">Latitude</th>
-        <th class="hidden-small">Longitude</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {#each providers as provider}
-        <ProviderRow {provider} refresh={fetchProviders} />
-      {/each}
-    </tbody>
-  </table>
+<table>
+  <thead>
+    <tr>
+      <th class="hidden-small">ID</th>
+      <th>Name</th>
+      <th class="hidden-small">City</th>
+      <th class="hidden-small">Postcode</th>
+      <th class="hidden-small">Street</th>
+      <th class="hidden-small">House Number</th>
+      <th class="hidden-small">Category</th>
+      <th class="hidden-small">Latitude</th>
+      <th class="hidden-small">Longitude</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {#each providers as provider}
+      <ProviderRow {provider} refresh={fetchProviders} />
+    {/each}
+  </tbody>
+</table>
 
-  <p>Total Providers: {totalProviders}</p>
+<p>Total Providers: {totalProviders}</p>

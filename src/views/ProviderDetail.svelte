@@ -3,8 +3,12 @@
   import type { Provider, FormProvider } from "../types";
   import { get } from "../util/api";
   import { goTo } from "../stores/router";
-  import { rolesStore } from "../stores/roles";
-  import { CreateProvider, DeleteProvider, UpdateProvider } from "../util/provider";
+  import {
+    CreateProvider,
+    DeleteProvider,
+    toFormProvider,
+    UpdateProvider,
+  } from "../util/provider";
 
   let providerId: string = $state("");
   let originalProvider: FormProvider | null = $state(null);
@@ -60,9 +64,9 @@
 
       if (providerId) {
         const response = await get<Provider>(
-          `${import.meta.env.VITE_PROVIDER_API_URL}providers/${providerId}`
+          `${import.meta.env.VITE_PROVIDER_API_URL}providers/${providerId}`,
         );
-        originalProvider = response;
+        originalProvider = toFormProvider(response);
         providerId = response.id;
         name = response.name;
         city = response.city;
@@ -82,27 +86,27 @@
 
   let validProvider: boolean = $derived.by(() => {
     return (
-    name.trim() !== "" &&
-    city.trim() !== "" &&
-    postcode.trim() !== "" &&
-    street.trim() !== "" &&
-    houseNumber.trim() !== "" &&
-    category.trim() !== "" &&
-    latitude !== 0.0 &&
-    longitude !== 0.0
+      name.trim() !== "" &&
+      city.trim() !== "" &&
+      postcode.trim() !== "" &&
+      street.trim() !== "" &&
+      houseNumber.trim() !== "" &&
+      category.trim() !== "" &&
+      latitude !== 0.0 &&
+      longitude !== 0.0
     );
   });
 
   const discardChanges = () => {
     if (originalProvider) {
-      name = originalProvider.name
-      city = originalProvider.city
-      postcode = originalProvider.postcode
-      street = originalProvider.street
-      houseNumber = originalProvider.houseNumber
-      category = originalProvider.category
-      latitude = originalProvider.latitude
-      longitude = originalProvider.longitude
+      name = originalProvider.name;
+      city = originalProvider.city;
+      postcode = originalProvider.postcode;
+      street = originalProvider.street;
+      houseNumber = originalProvider.houseNumber;
+      category = originalProvider.category;
+      latitude = originalProvider.latitude;
+      longitude = originalProvider.longitude;
     }
   };
 
@@ -123,7 +127,7 @@
       ? await UpdateProvider(editedProvider)
       : await CreateProvider(editedProvider);
     loading = false;
-    if (response.ok) {
+    if (response) {
       providerId && (originalProvider = { ...editedProvider });
       goTo("providerManagement");
     }
@@ -139,23 +143,60 @@
   <input type="text" id="city" disabled={loading} bind:value={city} required />
 
   <label for="postcode"> Postcode: </label>
-  <input type="text" id="postcode" disabled={loading} bind:value={postcode} required />
+  <input
+    type="text"
+    id="postcode"
+    disabled={loading}
+    bind:value={postcode}
+    required
+  />
 
   <label for="street"> Street: </label>
-  <input type="text" id="street" disabled={loading} bind:value={street} required />
+  <input
+    type="text"
+    id="street"
+    disabled={loading}
+    bind:value={street}
+    required
+  />
 
   <label for="houseNumber"> House Number: </label>
-  <input type="text" id="houseNumber" disabled={loading} bind:value={houseNumber} required />
-    
+  <input
+    type="text"
+    id="houseNumber"
+    disabled={loading}
+    bind:value={houseNumber}
+    required
+  />
+
   <label for="category"> Category: </label>
-  <input type="text" id="category" disabled={loading} bind:value={category} required />
+  <input
+    type="text"
+    id="category"
+    disabled={loading}
+    bind:value={category}
+    required
+  />
 
   <label for="latitude"> Latitude: </label>
-  <input type="number" step="0.01" id="latitude" disabled={loading} bind:value={latitude} required />
+  <input
+    type="number"
+    step="0.01"
+    id="latitude"
+    disabled={loading}
+    bind:value={latitude}
+    required
+  />
 
   <label for="longitude"> Longitude: </label>
-  <input type="number" step="0.01" id="longitude" disabled={loading} bind:value={longitude} required />
-
+  <input
+    type="number"
+    step="0.01"
+    id="longitude"
+    disabled={loading}
+    bind:value={longitude}
+    required
+  />
 
   <button
     type="button"
@@ -183,7 +224,7 @@
       loading = true;
       const response = await DeleteProvider(editedProvider);
       loading = false;
-      if (response.ok) {
+      if (response) {
         goTo("providerManagement");
       }
     }}
