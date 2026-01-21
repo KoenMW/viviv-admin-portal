@@ -59,7 +59,7 @@ export const UpdateProvider = async (
     `Updating provider ${provider.name}...`
   );
   try {
-    let coordsProvider = {
+    const coordsProvider = {
         id: provider.id,
         name: provider.name,
         city: provider.city,
